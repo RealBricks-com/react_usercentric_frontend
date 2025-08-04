@@ -136,12 +136,13 @@ export interface ProjectFilters {
 }
 
 export interface LeadCreateDto {
-  projectId?: number;
+  projectId?: number; // Optional in body since it’s set by query param
   developerId?: number;
-  userId?: number;
-  name?: string;
-  email?: string;
-  phone?: string;
+  name: string;
+  email: string;
+  phone: string;
   budgetMin?: number;
   budgetMax?: number;
+  message?: string;
 }
+

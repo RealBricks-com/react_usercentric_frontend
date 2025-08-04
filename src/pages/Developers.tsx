@@ -6,14 +6,30 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Building, Phone, Mail, MapPin, AlertCircle, Users } from 'lucide-react';
 import { api, ApiError } from '@/lib/api';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for routing
 
 const Developers = () => {
+  const navigate = useNavigate(); // Hook for navigation
   const { data: developers, isLoading, error } = useQuery({
     queryKey: ['developers'],
     queryFn: () => api.getDevelopers(),
     retry: 2,
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
+
+  // Handle "View Projects" button click
+  const handleViewProjects = (developerId) => {
+    navigate(`/`); // Navigate to projects page
+  };
+
+  // Handle "Contact" button click
+  const handleContact = (email) => {
+    if (email) {
+      window.location.href = `mailto:${email}`; // Open email client
+    } else {
+      alert('No email address available for this developer.');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -125,12 +141,22 @@ const Developers = () => {
 
                   {/* Action Buttons */}
                   <div className="flex gap-2 pt-2">
-                    <Button variant="outline" className="flex-1" size="sm">
+                    <Button 
+                      variant="outline" 
+                      className="flex-1" 
+                      size="sm" 
+                      onClick={() => handleViewProjects(developer.developerId)}
+                    >
                       <Building className="h-4 w-4 mr-1" />
                       View Projects
                     </Button>
                     
-                    <Button variant="premium" className="flex-1" size="sm">
+                    <Button 
+                      variant="premium" 
+                      className="flex-1" 
+                      size="sm" 
+                      onClick={() => handleContact(developer.email)}
+                    >
                       <Phone className="h-4 w-4 mr-1" />
                       Contact
                     </Button>

@@ -17,7 +17,13 @@ interface EnquiryModalProps {
   developerId?: number;
 }
 
-const EnquiryModal = ({ isOpen, onClose, projectId, projectName, developerId }: EnquiryModalProps) => {
+const EnquiryModal = ({
+  isOpen,
+  onClose,
+  projectId,
+  projectName,
+  developerId,
+}: EnquiryModalProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -25,12 +31,23 @@ const EnquiryModal = ({ isOpen, onClose, projectId, projectName, developerId }: 
     phone: '',
     budgetMin: '',
     budgetMax: '',
-    message: ''
+    message: '',
   });
+
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!projectId) {
+      toast({
+        title: 'Project ID is missing',
+        description: 'Unable to send enquiry without a project reference.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -42,17 +59,18 @@ const EnquiryModal = ({ isOpen, onClose, projectId, projectName, developerId }: 
         phone: formData.phone,
         budgetMin: formData.budgetMin ? parseFloat(formData.budgetMin) : undefined,
         budgetMax: formData.budgetMax ? parseFloat(formData.budgetMax) : undefined,
+        message: formData.message, // Always include message, even if empty
       };
 
       const response = await api.sendEnquiry(enquiryData);
 
       if (response.status) {
         toast({
-          title: "Enquiry Sent Successfully!",
-          description: "Thank you for your interest. Our team will contact you soon.",
-          variant: "default",
+          title: 'Enquiry Sent Successfully!',
+          description: 'Thank you for your interest. Our team will contact you soon.',
+          variant: 'default',
         });
-        
+
         // Reset form
         setFormData({
           name: '',
@@ -60,25 +78,23 @@ const EnquiryModal = ({ isOpen, onClose, projectId, projectName, developerId }: 
           phone: '',
           budgetMin: '',
           budgetMax: '',
-          message: ''
+          message: '',
         });
-        
+
         onClose();
       } else {
         throw new Error(response.message || 'Failed to send enquiry');
       }
     } catch (error) {
       console.error('Enquiry submission failed:', error);
-      
-      let errorMessage = 'Failed to send enquiry. Please try again.';
+      let errorMessage = 'Failed to send enquiry. Please try again later.';
       if (error instanceof ApiError) {
-        errorMessage = error.message;
+        errorMessage = `Error ${error.status}: ${error.message || 'Server error occurred'}`;
       }
-      
       toast({
-        title: "Error",
+        title: 'Error',
         description: errorMessage,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setIsSubmitting(false);
@@ -86,9 +102,9 @@ const EnquiryModal = ({ isOpen, onClose, projectId, projectName, developerId }: 
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -108,7 +124,6 @@ const EnquiryModal = ({ isOpen, onClose, projectId, projectName, developerId }: 
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Name */}
           <div className="space-y-2">
             <Label htmlFor="name" className="flex items-center gap-2">
               <User className="h-4 w-4" />
@@ -124,7 +139,6 @@ const EnquiryModal = ({ isOpen, onClose, projectId, projectName, developerId }: 
             />
           </div>
 
-          {/* Email */}
           <div className="space-y-2">
             <Label htmlFor="email" className="flex items-center gap-2">
               <Mail className="h-4 w-4" />
@@ -140,7 +154,6 @@ const EnquiryModal = ({ isOpen, onClose, projectId, projectName, developerId }: 
             />
           </div>
 
-          {/* Phone */}
           <div className="space-y-2">
             <Label htmlFor="phone" className="flex items-center gap-2">
               <Phone className="h-4 w-4" />
@@ -156,7 +169,6 @@ const EnquiryModal = ({ isOpen, onClose, projectId, projectName, developerId }: 
             />
           </div>
 
-          {/* Budget Range */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="budgetMin" className="flex items-center gap-2">
@@ -183,7 +195,6 @@ const EnquiryModal = ({ isOpen, onClose, projectId, projectName, developerId }: 
             </div>
           </div>
 
-          {/* Message */}
           <div className="space-y-2">
             <Label htmlFor="message">Additional Message</Label>
             <Textarea
@@ -195,7 +206,6 @@ const EnquiryModal = ({ isOpen, onClose, projectId, projectName, developerId }: 
             />
           </div>
 
-          {/* Submit Button */}
           <div className="flex gap-3 pt-4">
             <Button
               type="button"

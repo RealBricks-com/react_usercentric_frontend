@@ -9,9 +9,7 @@ import {
   LeadResponseDto
 } from '@/types/api';
 
-// You should replace this with your actual API base URL
-// For development, you can set VITE_API_BASE_URL in your .env file
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5099';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 class ApiError extends Error {
   constructor(message: string, public status: number) {
@@ -44,16 +42,13 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
 }
 
 export const api = {
-  // Projects
   async getProjectCards(filters: ProjectFilters = {}): Promise<ProjectCoreCardDtoPageResult> {
     const searchParams = new URLSearchParams();
-    
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
         searchParams.append(key, value.toString());
       }
     });
-
     const query = searchParams.toString();
     return fetchApi<ProjectCoreCardDtoPageResult>(
       `/api/ProjectCore/cards${query ? `?${query}` : ''}`
@@ -64,12 +59,10 @@ export const api = {
     return fetchApi<ProjectFullDto>(`/api/ProjectCore/full/${projectId}`);
   },
 
-  // Areas
   async getAreas(): Promise<AreaReadDto[]> {
     return fetchApi<AreaReadDto[]>('/api/Area');
   },
 
-  // Developers
   async getDevelopers(): Promise<DeveloperCoreReadDto[]> {
     return fetchApi<DeveloperCoreReadDto[]>('/api/DeveloperCore');
   },
@@ -78,26 +71,19 @@ export const api = {
     return fetchApi<DeveloperCoreReadDto>(`/id/${id}`);
   },
 
-  // Amenities
   async getAmenities(): Promise<AmenityReadDto[]> {
     return fetchApi<AmenityReadDto[]>('/api/amenities');
   },
 
-  // Lead/Enquiry
   async sendEnquiry(data: LeadCreateDto): Promise<LeadResponseDto> {
-    const searchParams = new URLSearchParams();
-    
-    Object.entries(data).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        searchParams.append(key, value.toString());
-      }
-    });
-
-    return fetchApi<LeadResponseDto>(`/api/Lead/sendenquiry?${searchParams.toString()}`, {
-      method: 'POST',
-    });
-  },
+  return fetchApi<LeadResponseDto>(`/api/Lead/sendenquiry`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+}
 };
 
-// Error handling utility
 export { ApiError };

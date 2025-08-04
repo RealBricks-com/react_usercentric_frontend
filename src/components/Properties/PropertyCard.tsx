@@ -28,7 +28,7 @@ const PropertyCard = ({ project, onEnquireClick }: PropertyCardProps) => {
     <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-card to-muted/20">
       <div className="relative overflow-hidden">
         <img
-          src={mainImage}
+          src={project.projectMedium[0].fileUrl}
           alt={project.name || 'Property'}
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
           onError={(e) => {
