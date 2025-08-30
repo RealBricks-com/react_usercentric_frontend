@@ -11,7 +11,7 @@ import {
 
 // You should replace this with your actual API base URL
 // For development, you can set VITE_API_BASE_URL in your .env file
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://your-api-url.com';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ' http://localhost:5099';
 
 class ApiError extends Error {
   constructor(message: string, public status: number) {
